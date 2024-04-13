@@ -59,6 +59,7 @@
     <div id="result"></div>
 
     <script>
+	document.getElementById('search').addEventListener('keyup', filterMaterials);
         let lastCalculation = {};
 
         function filterMaterials() {
