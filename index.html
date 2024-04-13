@@ -3,40 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <title>surowce</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-
-	body {
-	            font-family: Arial, sans-serif;
-	 }
-.search-results div {
-    padding: 5px;
-    margin-top: 2px;
-    background-color: #f8f8f8;
-    border: 1px solid #ddd;
-    cursor: pointer;
-}
-.search-results div:hover {
-    background-color: #e9e9e9;
-}
-
-
-	    
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .search-results div {
+            padding: 5px;
+            margin-top: 2px;
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .search-results div:hover {
+            background-color: #e9e9e9;
+        }
     </style>
 </head>
 <body>
-    <h1>Kalkulator surowców v3</h1>
+    <h1>Kalkulator surowców v4</h1>
     <form id="calcForm">
         <label for="search">Wyszukaj surowiec:</label>
-<input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
-<div id="search-results" class="search-results"></div>
+        <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
+        <div id="search-results" class="search-results"></div>
         <br><br>
         <label for="totalWeight">Całkowita waga surowca (kg):</label>
-        <input type="number" id="totalWeight" oninput="calculate()" required>
+        <input type="number" id="totalWeight" oninput="triggerCalculate()" required>
         <br><br>
         <label for="width">Szerokość surowca (mm):</label>
-        <input type="number" id="width" oninput="calculate()" required>
+        <input type="number" id="width" oninput="triggerCalculate()" required>
         <br><br>
         <button type="button" onclick="sendDataToSheet()">Wyślij</button>
     </form>
@@ -44,79 +39,63 @@
     <div id="result"></div>
 
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var searchInput = document.getElementById('search');
+            searchInput.addEventListener('input', filterMaterials);
+        });
 
+        let lastCalculation = {};
+        let selectedDensity;
 
-document.addEventListener('DOMContentLoaded', function () {
-    var searchInput = document.getElementById('search');
-    searchInput.addEventListener('input', filterMaterials);
-});
+        function filterMaterials() {
+            var input = document.getElementById('search').value.toLowerCase();
+            var resultsDiv = document.getElementById('search-results');
+            resultsDiv.innerHTML = ''; // Clear current results
 
-let lastCalculation = {};
+            var materials = [
+                { name: "Półbłysk", value: "0.140" },
+                { name: "Coated FH21", value: "0.140" },
+                { name: "Coated RP3000", value: "0.140" },
+                { name: "Adestor A251", value: "0.140" },
+                { name: "MC S2000", value: "0.140" },
+                { name: "MCS2045", value: "0.140" },
+                { name: "Thermal Eco", value: "0.150" }
+            ];
 
-function filterMaterials() {
-    var input = document.getElementById('search').value.toLowerCase();
-    var resultsDiv = document.getElementById('search-results');
-    resultsDiv.innerHTML = ''; // Clear current results
+            var matchingMaterials = materials.filter(material => material.name.toLowerCase().includes(input));
+            matchingMaterials.forEach(function(material) {
+                var div = document.createElement('div');
+                div.textContent = material.name;
+                div.onclick = function() {
+                    selectMaterial(material);
+                };
+                resultsDiv.appendChild(div);
+            });
+        }
 
-    var materials = [
-        { name: "Półbłysk", value: "0.140" },
-        { name: "Coated FH21", value: "0.140" },
-        { name: "Coated RP3000", value: "0.140" },
-        { name: "Adestor A251", value: "0.140" },
-        { name: "MC S2000", value: "0.140" },
-        { name: "MCS2045", value: "0.140" },
-        { name: "Thermal Eco", value: "0.150" }
-    ];
+        function selectMaterial(material) {
+            document.getElementById('search').value = material.name;
+            selectedDensity = material.value; // Save density for calculation
+            document.getElementById('search-results').innerHTML = ''; // Clear the results
+            triggerCalculate(); // Trigger calculation after selection
+        }
 
-    var matchingMaterials = materials.filter(material => material.name.toLowerCase().includes(input));
-    matchingMaterials.forEach(function(material) {
-        var div = document.createElement('div');
-        div.textContent = material.name;
-        div.onclick = function() {
-            selectMaterial(material);
-        };
-        resultsDiv.appendChild(div);
-    });
-}
+        function triggerCalculate() {
+            if (selectedDensity) {
+                calculate(selectedDensity);
+            }
+        }
 
-function selectMaterial(material) {
-    document.getElementById('search').value = material.name;
-    document.getElementById('search-results').innerHTML = ''; // Clear the results
-    calculate(material.value); // Call calculate with the selected material's value
-}
-
-function calculate(density) {
-    var totalWeight = parseFloat(document.getElementById('totalWeight').value);
-    var width = parseFloat(document.getElementById('width').value);
-    var result = totalWeight / density / width * 1000;
-    result = Math.ceil(result / 10) * 10;
-
-    document.getElementById('result').innerText = "Wynik: " + result;
-
-    lastCalculation = {
-        material: document.getElementById('search').value,
-        weight: totalWeight,
-        width: width,
-        result: result,
-        timestamp: new Date().toISOString()
-    };
-}
-
-
-
-
-		function calculate() {
-			var materialName = document.getElementById('material').options[document.getElementById('material').selectedIndex].text;
-			var materialDensity = parseFloat(document.getElementById('material').value);
-			var totalWeight = parseFloat(document.getElementById('totalWeight').value);
-			var width = parseFloat(document.getElementById('width').value);
-			var result = totalWeight / materialDensity / width * 1000; // Prawidłowe obliczenie
-			result = Math.ceil(result / 10) * 10; 
+        function calculate(density) {
+            var totalWeight = parseFloat(document.getElementById('totalWeight').value);
+            var width = parseFloat(document.getElementById('width').value);
+            var result = totalWeight / density / width * 1000;
+            result = Math.ceil(result / 10) * 10;
 
             document.getElementById('result').innerText = "Wynik: " + result;
 
             lastCalculation = {
-                material: materialName,
+                material: document.getElementById('search').value,
                 weight: totalWeight,
                 width: width,
                 result: result,
@@ -129,11 +108,11 @@ function calculate(density) {
                 alert("Proszę najpierw obliczyć wynik.");
                 return;
             }
-			console.log(JSON.stringify(lastCalculation));
+            console.log(JSON.stringify(lastCalculation));
 
             fetch('https://script.google.com/macros/s/AKfycbxJB3TKv26aFkPZNcaYvpxKrfy8Fr_XGnD3TagYBEdFFQ6h61E-daMAHJLjWUN0CkTe/exec', {
                 method: 'POST',
-                mode: 'no-cors',  // Opcjonalnie, w zależności od konfiguracji CORS
+                mode: 'no-cors',
                 headers: {
                     'Content-Type': 'application/json',
                 },
