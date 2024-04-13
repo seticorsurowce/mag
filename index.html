@@ -23,7 +23,7 @@
     </style>
 </head>
 <body>
-    <h1>Kalkulator surowców</h1>
+    <h1>Kalkulator surowców v2</h1>
     <form id="calcForm">
         <label for="search">Wyszukaj surowiec:</label>
         <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
@@ -95,6 +95,8 @@ if (txtValue.toLowerCase().indexOf(input) > -1) {
 
     // Jeśli liczba ukrytych opcji równa się liczbie wszystkich opcji, ukryj cały select
     select.style.display = hiddenCount === options.length ? "none" : "block";
+    // Dodaj poniższą linię, aby wymusić przerysowanie elementu select
+    select.size = select.size;
 }
 
 
