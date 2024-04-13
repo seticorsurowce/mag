@@ -56,24 +56,25 @@
 
         let lastCalculation = {};
 
-        function filterMaterials() {
-            var input = document.getElementById('search').value.toLowerCase();
-            var select = document.getElementById('material');
-            var options = select.options;
-            var hidden = true;
+function filterMaterials() {
+    var input = document.getElementById('search').value.toLowerCase();
+    var select = document.getElementById('material');
+    var options = select.options;
+    var hidden = true;
 
-            for (var i = 0; i < options.length; i++) {
-                var txtValue = options[i].textContent || options[i].innerText;
-                if (txtValue.toLowerCase().indexOf(input) > -1) {
-                    options[i].style.display = "";
-                    hidden = false;
-                } else {
-                    options[i].style.display = "none";
-                }
-            }
-
-            select.className = hidden ? 'hidden' : '';
+    for (var i = 0; i < options.length; i++) {
+        var txtValue = options[i].textContent || options[i].innerText.toLowerCase();
+        if (txtValue.includes(input)) {
+            options[i].style.display = "block"; // upewnij się, że opcje są widoczne
+            hidden = false;
+        } else {
+            options[i].style.display = "none"; // ukryj opcje, które nie pasują
         }
+    }
+
+    select.style.display = hidden ? "none" : "block"; // ukryj cały select, jeśli nie ma pasujących opcji
+}
+
 
 		function calculate() {
 			var materialName = document.getElementById('material').options[document.getElementById('material').selectedIndex].text;
