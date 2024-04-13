@@ -59,7 +59,11 @@
     <div id="result"></div>
 
     <script>
-	document.getElementById('search').addEventListener('keyup', filterMaterials);
+	document.addEventListener('DOMContentLoaded', function () {
+    var searchInput = document.getElementById('search');
+    searchInput.addEventListener('input', filterMaterials); // Zmiana z 'keyup' na 'input'
+});
+
         let lastCalculation = {};
 
         function filterMaterials() {
