@@ -55,7 +55,7 @@
 });
 
         let lastCalculation = {};
-/*
+
 function filterMaterials() {
     var input = document.getElementById('search').value.toLowerCase();
     var select = document.getElementById('material');
@@ -75,29 +75,6 @@ function filterMaterials() {
     // Jeśli liczba ukrytych opcji równa się liczbie wszystkich opcji, ukryj cały select
     select.style.display = hiddenCount === options.length ? "none" : "block";
 }
-*/
-
-	    function filterMaterials() {
-    var input = document.getElementById('search').value.toLowerCase();
-    var select = document.getElementById('material');
-    var options = select.options;
-    var isAnyOptionVisible = false;
-
-    for (var i = 0; i < options.length; i++) {
-        var txtValue = options[i].textContent || options[i].innerText.toLowerCase();
-        if (txtValue.indexOf(input) > -1) {
-            options[i].style.visibility = "visible"; // Pokaż pasujące opcje
-            options[i].style.height = "auto"; // Przywróć naturalną wysokość
-            isAnyOptionVisible = true;
-        } else {
-            options[i].style.visibility = "hidden"; // Ukryj niepasujące opcje
-            options[i].style.height = "0"; // Zredukuj wysokość do 0
-        }
-    }
-
-    select.style.visibility = isAnyOptionVisible ? "visible" : "hidden"; // Ukryj cały select, jeśli nie ma widocznych opcji
-}
-
 
 
 
