@@ -60,20 +60,22 @@ function filterMaterials() {
     var input = document.getElementById('search').value.toLowerCase();
     var select = document.getElementById('material');
     var options = select.options;
-    var hidden = true;
+    var hiddenCount = 0; // Zmienna do liczenia ukrytych opcji
 
     for (var i = 0; i < options.length; i++) {
-        var txtValue = options[i].textContent || options[i].innerText.toLowerCase();
-        if (txtValue.includes(input)) {
-            options[i].style.display = "block"; // upewnij się, że opcje są widoczne
-            hidden = false;
+        var txtValue = options[i].textContent || options[i].innerText;
+        if (txtValue.toLowerCase().indexOf(input) > -1) {
+            options[i].style.display = "block"; // Pokazuj pasujące opcje
         } else {
-            options[i].style.display = "none"; // ukryj opcje, które nie pasują
+            options[i].style.display = "none"; // Ukryj niepasujące opcje
+            hiddenCount++; // Inkrementuj licznik ukrytych opcji
         }
     }
 
-    select.style.display = hidden ? "none" : "block"; // ukryj cały select, jeśli nie ma pasujących opcji
+    // Jeśli liczba ukrytych opcji równa się liczbie wszystkich opcji, ukryj cały select
+    select.style.display = hiddenCount === options.length ? "none" : "block";
 }
+
 
 
 		function calculate() {
