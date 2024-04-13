@@ -35,7 +35,7 @@
         <br><br>
         <button type="button" onclick="sendDataToSheet()">Wyślij</button>
     </form>
-    <h3>Wynik:</h3>
+    <h3>Metry:</h3>
     <div id="result"></div>
 
     <script>
@@ -57,8 +57,8 @@
                 { name: "Coated FH21", value: "0.140" },
                 { name: "Coated RP3000", value: "0.140" },
                 { name: "Adestor A251", value: "0.140" },
-                { name: "MC S2000", value: "0.140" },
-                { name: "MCS2045", value: "0.140" },
+                { name: "BJ993 MC S2000", value: "0.140" },
+                { name: "BJ995 MC S2045", value: "0.140" },
                 { name: "Thermal Eco", value: "0.150" }
             ];
 
@@ -89,10 +89,10 @@
         function calculate(density) {
             var totalWeight = parseFloat(document.getElementById('totalWeight').value);
             var width = parseFloat(document.getElementById('width').value);
-            var result = totalWeight / density / width * 1000;
+            var result = totalWeight - 0.5 / density / width * 1000;
             result = Math.ceil(result / 10) * 10;
 
-            document.getElementById('result').innerText = "Wynik: " + result;
+            document.getElementById('result').innerText = "mb: " + result;
 
             lastCalculation = {
                 material: document.getElementById('search').value,
