@@ -64,12 +64,33 @@ function filterMaterials() {
 
     for (var i = 0; i < options.length; i++) {
         var txtValue = options[i].textContent || options[i].innerText;
+
+
+
+	    
+if (txtValue.toLowerCase().indexOf(input) > -1) {
+    options[i].style.visibility = "visible"; // Pokazuj pasujące opcje
+    options[i].style.display = "block";
+} else {
+    options[i].style.visibility = "hidden"; // Ukryj niepasujące opcje
+    options[i].style.display = "none";
+}
+
+
+
+
+	    
+
+	    
+	    /*
         if (txtValue.toLowerCase().indexOf(input) > -1) {
             options[i].style.display = "block"; // Pokazuj pasujące opcje
         } else {
             options[i].style.display = "none"; // Ukryj niepasujące opcje
             hiddenCount++; // Inkrementuj licznik ukrytych opcji
         }
+
+	    */
     }
 
     // Jeśli liczba ukrytych opcji równa się liczbie wszystkich opcji, ukryj cały select
