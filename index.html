@@ -10,32 +10,27 @@
 	body {
 	            font-family: Arial, sans-serif;
 	 }
-.hidden { display: none; }
-@media (max-width: 600px) {
-    select, input[type="number"], input[type="text"], button {
-        width: 100%;
-        margin-top: 10px;
-        display: block; /* Upewnij się, że wszystkie elementy są blokowe i dobrze widoczne */
-    }
+.search-results div {
+    padding: 5px;
+    margin-top: 2px;
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    cursor: pointer;
 }
+.search-results div:hover {
+    background-color: #e9e9e9;
+}
+
 
 	    
     </style>
 </head>
 <body>
-    <h1>Kalkulator surowców v2</h1>
+    <h1>Kalkulator surowców v3</h1>
     <form id="calcForm">
         <label for="search">Wyszukaj surowiec:</label>
-        <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
-        <select id="material" onchange="calculate()" size="6" class="hidden">
-            <option value="0.140">Półbłysk</option>
-            <option value="0.140">Coated FH21</option>
-            <option value="0.140">Coated RP3000</option>
-            <option value="0.140">Adestor A251</option>
-            <option value="0.140">MC S2000</option>
-            <option value="0.140">MCS2045</option>
-            <option value="0.150">Thermal Eco</option>
-        </select>
+<input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
+<div id="search-results" class="search-results"></div>
         <br><br>
         <label for="totalWeight">Całkowita waga surowca (kg):</label>
         <input type="number" id="totalWeight" oninput="calculate()" required>
@@ -49,55 +44,64 @@
     <div id="result"></div>
 
     <script>
-	document.addEventListener('DOMContentLoaded', function () {
+
+
+document.addEventListener('DOMContentLoaded', function () {
     var searchInput = document.getElementById('search');
-    searchInput.addEventListener('input', filterMaterials); // Zmiana z 'keyup' na 'input'
+    searchInput.addEventListener('input', filterMaterials);
 });
 
-        let lastCalculation = {};
+let lastCalculation = {};
 
 function filterMaterials() {
     var input = document.getElementById('search').value.toLowerCase();
-    var select = document.getElementById('material');
-    var options = select.options;
-    var hiddenCount = 0; // Zmienna do liczenia ukrytych opcji
+    var resultsDiv = document.getElementById('search-results');
+    resultsDiv.innerHTML = ''; // Clear current results
 
-    for (var i = 0; i < options.length; i++) {
-        var txtValue = options[i].textContent || options[i].innerText;
+    var materials = [
+        { name: "Półbłysk", value: "0.140" },
+        { name: "Coated FH21", value: "0.140" },
+        { name: "Coated RP3000", value: "0.140" },
+        { name: "Adestor A251", value: "0.140" },
+        { name: "MC S2000", value: "0.140" },
+        { name: "MCS2045", value: "0.140" },
+        { name: "Thermal Eco", value: "0.150" }
+    ];
 
-
-
-	    
-if (txtValue.toLowerCase().indexOf(input) > -1) {
-    options[i].style.visibility = "visible"; // Pokazuj pasujące opcje
-    options[i].style.display = "block";
-} else {
-    options[i].style.visibility = "hidden"; // Ukryj niepasujące opcje
-    options[i].style.display = "none";
+    var matchingMaterials = materials.filter(material => material.name.toLowerCase().includes(input));
+    matchingMaterials.forEach(function(material) {
+        var div = document.createElement('div');
+        div.textContent = material.name;
+        div.onclick = function() {
+            selectMaterial(material);
+        };
+        resultsDiv.appendChild(div);
+    });
 }
 
-
-
-
-	    
-
-	    
-	    /*
-        if (txtValue.toLowerCase().indexOf(input) > -1) {
-            options[i].style.display = "block"; // Pokazuj pasujące opcje
-        } else {
-            options[i].style.display = "none"; // Ukryj niepasujące opcje
-            hiddenCount++; // Inkrementuj licznik ukrytych opcji
-        }
-
-	    */
-    }
-
-    // Jeśli liczba ukrytych opcji równa się liczbie wszystkich opcji, ukryj cały select
-    select.style.display = hiddenCount === options.length ? "none" : "block";
-    // Dodaj poniższą linię, aby wymusić przerysowanie elementu select
-    select.size = select.size;
+function selectMaterial(material) {
+    document.getElementById('search').value = material.name;
+    document.getElementById('search-results').innerHTML = ''; // Clear the results
+    calculate(material.value); // Call calculate with the selected material's value
 }
+
+function calculate(density) {
+    var totalWeight = parseFloat(document.getElementById('totalWeight').value);
+    var width = parseFloat(document.getElementById('width').value);
+    var result = totalWeight / density / width * 1000;
+    result = Math.ceil(result / 10) * 10;
+
+    document.getElementById('result').innerText = "Wynik: " + result;
+
+    lastCalculation = {
+        material: document.getElementById('search').value,
+        weight: totalWeight,
+        width: width,
+        result: result,
+        timestamp: new Date().toISOString()
+    };
+}
+
 
 
 
