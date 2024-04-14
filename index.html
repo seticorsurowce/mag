@@ -21,112 +21,169 @@
     </style>
 </head>
 <body>
-    <h1>Kalkulator surowców v4</h1>
+    <h1>Kalkulator surowców</h1>
     <form id="calcForm">
         <label for="search">Wyszukaj surowiec:</label>
         <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
         <div id="search-results" class="search-results"></div>
+        <input type="text" id="manualEntry" placeholder="Wpisz nazwę surowca ręcznie...">
         <br><br>
         <label for="totalWeight">Całkowita waga surowca (kg):</label>
-        <input type="number" id="totalWeight" oninput="triggerCalculate()" required>
+        <input type="number" id="totalWeight" required>
         <br><br>
         <label for="width">Szerokość surowca (mm):</label>
-        <input type="number" id="width" oninput="triggerCalculate()" required>
+        <input type="number" id="width" required>
         <br><br>
         <button type="button" onclick="sendDataToSheet()">Wyślij</button>
+        <button type="button" onclick="resetForm()">Resetuj</button>
     </form>
     <h3>Metry:</h3>
     <div id="result"></div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var searchInput = document.getElementById('search');
-            searchInput.addEventListener('input', filterMaterials);
-        });
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var searchInput = document.getElementById('search');
+    var manualEntryInput = document.getElementById('manualEntry');
+    var totalWeightInput = document.getElementById('totalWeight');
+    var widthInput = document.getElementById('width');
 
-        let lastCalculation = {};
-        let selectedDensity;
+    searchInput.addEventListener('input', filterMaterials);
+    totalWeightInput.addEventListener('input', checkForCalculations);
+    widthInput.addEventListener('input', checkForCalculations);
+});
 
-        function filterMaterials() {
-            var input = document.getElementById('search').value.toLowerCase();
-            var resultsDiv = document.getElementById('search-results');
-            resultsDiv.innerHTML = ''; // Clear current results
+let lastCalculation = {};
 
-            var materials = [
-                { name: "Półbłysk", value: "0.140" },
-                { name: "Coated FH21", value: "0.140" },
-                { name: "Coated RP3000", value: "0.140" },
-                { name: "Adestor A251", value: "0.140" },
-                { name: "BJ993 MC S2000", value: "0.140" },
-                { name: "BJ995 MC S2045", value: "0.140" },
-                { name: "Thermal Eco", value: "0.150" }
-            ];
+function filterMaterials() {
+    var input = document.getElementById('search').value.toLowerCase();
+    var resultsDiv = document.getElementById('search-results');
 
-            var matchingMaterials = materials.filter(material => material.name.toLowerCase().includes(input));
-            matchingMaterials.forEach(function(material) {
-                var div = document.createElement('div');
-                div.textContent = material.name;
-                div.onclick = function() {
-                    selectMaterial(material);
-                };
-                resultsDiv.appendChild(div);
-            });
-        }
+    if (input.length < 2) {
+        resultsDiv.innerHTML = '';
+        return;
+    }
 
-        function selectMaterial(material) {
-            document.getElementById('search').value = material.name;
-            selectedDensity = material.value; // Save density for calculation
-            document.getElementById('search-results').innerHTML = ''; // Clear the results
-            triggerCalculate(); // Trigger calculation after selection
-        }
+var materials = [
+			{ name: "8222362 Thermal Eco 200 RR23 HG65", value: "0.144" },
+			{ name: "8243572 Raflacoat Plus-FSC RH9X HG65", value: "0.153" },
+			{ name: "8243589 Raflacoat Plus FSC RP51 HG65", value: "0.153" },
+			{ name: "AA639 PET WHITE S8020", value: "0.2" },
+			{ name: "AA644 TRANSF PET MATT CHR TOP S8020-BG42WH", value: "0.2" },
+			{ name: "AJ112 Transfer Vellum FSC S2045N-BG40BR", value: "0.138" },
+			{ name: "AL597 PP60 Top White S692N-BG40WH FSC", value: "0.124" },
+			{ name: "AN589 MC PRIMECOAT C2075", value: "0.151" },
+			{ name: "AN751 TRANSFER VELLUM FSC C2075N-BG40BR", value: "0.151" },
+			{ name: "ANTALIS Adestor A251 półbłysk", value: "0.153" },
+			{ name: "ANTALIS Adestor HM półbłysk", value: "0.153" },
+			{ name: "Antalis Thermal eco A251", value: "0.146" },
+			{ name: "Antalis Thermal eco HM10", value: "0.146" },
+			{ name: "8255728 Raflacoat RH9X PET23", value: "0.13" },
+			{ name: "BJ993 MC FSC S2000NG-BG40BR", value: "0.138" },
+			{ name: "BJ995 MC FSC S2045N-BG40BR", value: "0.151" },
+			{ name: "BK645 Thermal Eco BPA Free S2000NG-BG40BR", value: "0.139" },
+			{ name: "BM312 Thermal Eco BPA Free S2045N-BG40BR", value: "0.141" },
+			{ name: "BM313 Thermal Eco BPA Free R5000N-BG40BR", value: "0.139" },
+			{ name: "BS770 Thermal 200HD Plus FSC S2045N-BG40BR", value: "0.151" },
+			{ name: "BU455 TRANSFER PET MT WH TC6 S8002-BG42WH", value: "0.16" },
+			{ name: "Coated 80 AP904 YG60", value: "0.153" },
+			{ name: "Coated 80 FH21 YG60", value: "0.153" },
+			{ name: "Coated 80 RP3000 YG60", value: "0.153" },
+			{ name: "Coated gloss FH21 OPQ", value: "0.3" },
+			{ name: "COVER OPAQUE MIX", value: "0.3" },
+			{ name: "ETP 130G", value: "0.13" },
+			{ name: "ETP 170G", value: "0.17" },
+			{ name: "ETP 200G", value: "0.2" },
+			{ name: "ETP 250G", value: "0.25" },
+			{ name: "Fedrigoni ECO RF20", value: "0.139" },
+			{ name: "JET GLOSS POLCOAT", value: "0.2" },
+			{ name: "JUJO TOP 182G", value: "0.182" },
+			{ name: "KANZAN KPR415", value: "0.17" },
+			{ name: "PE White ANTALIS", value: "0.157" },
+			{ name: "RI-707/60 PP Gloss Clear TC8 AP901 WG62", value: "0.132" },
+			{ name: "RI-757/60 PP Cavitated Gloss White AP901", value: "0.124" },
+			{ name: "Robuskin 200 HDPE", value: "0.2" },
+			{ name: "HERMA Thermal Eco 62DPS", value: "0.146" },
+			{ name: "HERMA Thermal Eco 62GPT", value: "0.146" },
+			{ name: "Thermal Eco HSN FH21 YG60", value: "0.146" },
+			{ name: "Thermal Eco HSN RP3000 YG60", value: "0.146" },
+			{ name: "Thermal Top HS FH21 YG60", value: "0.151" },
+			{ name: "HERMA Thermal TOP 62DPS", value: "0.151" },
+			{ name: "HERMA Thermal TOP 62GPT", value: "0.151" },
+			{ name: "Vellum SC RP3000 YG60", value: "0.143" },
+			{ name: "Vestchema ECO REMOVABLE", value: "0.146" },
+			{ name: "Vestchema top akryl", value: "0.151" },
+			{ name: "HERMAwhite vellum 62D", value: "0.155" }
+		];
 
-        function triggerCalculate() {
-            if (selectedDensity) {
-                calculate(selectedDensity);
-            }
-        }
-
-        function calculate(density) {
-            var totalWeight = parseFloat(document.getElementById('totalWeight').value);
-            var width = parseFloat(document.getElementById('width').value);
-            var result = totalWeight - 0.5 / density / width * 1000;
-            result = Math.ceil(result / 10) * 10;
-
-            document.getElementById('result').innerText = "mb: " + result;
-
-            lastCalculation = {
-                material: document.getElementById('search').value,
-                weight: totalWeight,
-                width: width,
-                result: result,
-                timestamp: new Date().toISOString()
+    resultsDiv.innerHTML = '';
+    materials.filter(material => material.name.toLowerCase().includes(input))
+        .forEach(material => {
+            var div = document.createElement('div');
+            div.textContent = material.name;
+            div.onclick = function() {
+                document.getElementById('search').value = material.name;
+                document.getElementById('manualEntry').value = '';
+                document.getElementById('search-results').innerHTML = '';
+                lastCalculation.material = material.name;
+                lastCalculation.density = material.value;
+                checkForCalculations();
             };
-        }
+            resultsDiv.appendChild(div);
+        });
+}
 
-        function sendDataToSheet() {
-            if (!lastCalculation.material) {
-                alert("Proszę najpierw obliczyć wynik.");
-                return;
-            }
-            console.log(JSON.stringify(lastCalculation));
+function checkForCalculations() {
+    var totalWeight = parseFloat(document.getElementById('totalWeight').value);
+    var width = parseFloat(document.getElementById('width').value);
+    if (lastCalculation.density && totalWeight && width) {
+        calculate(lastCalculation.density, totalWeight, width);
+    }
+}
 
-            fetch('https://script.google.com/macros/s/AKfycbxJB3TKv26aFkPZNcaYvpxKrfy8Fr_XGnD3TagYBEdFFQ6h61E-daMAHJLjWUN0CkTe/exec', {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(lastCalculation)
-            })
-            .then(response => {
-                console.log('Sent data successfully');
-                alert("Dane zostały wysłane!");
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert("Wystąpił błąd podczas wysyłania danych: " + error);
-            });
-        }
-    </script>
+function calculate(density, totalWeight, width) {
+    var result = (totalWeight - 0.5) / density / width * 1000;
+    lastCalculation.result = Math.ceil(result / 10) * 10;
+    document.getElementById('result').innerText = lastCalculation.result + " mb";
+}
+
+function sendDataToSheet() {
+    lastCalculation.weight = parseFloat(document.getElementById('totalWeight').value);
+    lastCalculation.width = parseFloat(document.getElementById('width').value);
+    lastCalculation.material = document.getElementById('search').value || document.getElementById('manualEntry').value;
+    
+    if (lastCalculation.weight && lastCalculation.width) {
+        console.log(JSON.stringify(lastCalculation));
+        fetch('https://script.google.com/macros/s/AKfycbxJB3TKv26aFkPZNcaYvpxKrfy8Fr_XGnD3TagYBEdFFQ6h61E-daMAHJLjWUN0CkTe/exec', {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(lastCalculation)
+        })
+        .then(response => {
+            console.log('Sent data successfully');
+            alert("Dane zostały wysłane!");
+            resetForm();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("Wystąpił błąd podczas wysyłania danych: " + error);
+        });
+    } else {
+        alert("Proszę uzupełnić dane przed wysłaniem.");
+    }
+}
+
+function resetForm() {
+    document.getElementById('calcForm').reset();
+    document.getElementById('result').innerText = '';
+    lastCalculation = {};
+}
+</script>
+
+
+
+
 </body>
 </html>
