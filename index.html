@@ -150,6 +150,7 @@ function sendDataToSheet() {
     lastCalculation.weight = parseFloat(document.getElementById('totalWeight').value);
     lastCalculation.width = parseFloat(document.getElementById('width').value);
     lastCalculation.material = document.getElementById('search').value || document.getElementById('manualEntry').value;
+    lastCalculation.timestamp = new Date().toISOString();
     
     if (lastCalculation.weight && lastCalculation.width) {
         console.log(JSON.stringify(lastCalculation));
