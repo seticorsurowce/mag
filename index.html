@@ -21,12 +21,12 @@
     </style>
 </head>
 <body>
-    <h1>Kalkulator surowców</h1>
+    <h1>Kalkulator surowców v4</h1>
     <form id="calcForm">
         <label for="search">Wyszukaj surowiec:</label>
-        <input type="text" id="search" oninput="filterMaterials()" placeholder="Wybierz z listy">
+        <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
         <div id="search-results" class="search-results"></div>
-        <input type="text" id="manualEntry" placeholder="Wpisz ręcznie">
+        <input type="text" id="manualEntry" placeholder="Wpisz nazwę surowca ręcznie...">
         <br><br>
         <label for="totalWeight">Całkowita waga surowca (kg):</label>
         <input type="number" id="totalWeight" required>
@@ -34,6 +34,10 @@
         <label for="width">Szerokość surowca (mm):</label>
         <input type="number" id="width" required>
         <br><br>
+		<label for="location">Miejsce: </label>
+		<input type="text" id="location" required>
+		<br><br>
+
         <button type="button" onclick="sendDataToSheet()">Wyślij</button>
         <button type="button" onclick="resetForm()">Resetuj</button>
     </form>
@@ -143,18 +147,20 @@ function checkForCalculations() {
 function calculate(density, totalWeight, width) {
     var result = (totalWeight - 0.5) / density / width * 1000;
     lastCalculation.result = Math.ceil(result / 10) * 10;
-    document.getElementById('result').innerText = lastCalculation.result + " mb";
+    document.getElementById('result').innerText = "mb: " + lastCalculation.result;
 }
 
 function sendDataToSheet() {
     lastCalculation.weight = parseFloat(document.getElementById('totalWeight').value);
     lastCalculation.width = parseFloat(document.getElementById('width').value);
     lastCalculation.material = document.getElementById('search').value || document.getElementById('manualEntry').value;
-    lastCalculation.timestamp = new Date().toISOString();
+	lastCalculation.location = document.getElementById('location').value; 
+	lastCalculation.timestamp = new Date().toISOString();
+	
     
-    if (lastCalculation.weight && lastCalculation.width) {
+     if (lastCalculation.location && (lastCalculation.weight && lastCalculation.width)) {
         console.log(JSON.stringify(lastCalculation));
-        fetch('https://script.google.com/macros/s/AKfycbxJB3TKv26aFkPZNcaYvpxKrfy8Fr_XGnD3TagYBEdFFQ6h61E-daMAHJLjWUN0CkTe/exec', {
+        fetch('https://script.google.com/macros/s/AKfycbyllIQYY8-0gfjoJw48BJpWwdN1GTmObXbJc8gMlG6MD0ciwF62kRyzFR60Ta0n8VOA/exec', {
             method: 'POST',
             mode: 'no-cors',
             headers: {
