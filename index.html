@@ -18,6 +18,22 @@
         .search-results div:hover {
             background-color: #e9e9e9;
         }
+        .mode-selector {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .mode-selector label {
+            margin-right: 20px;
+            font-weight: bold;
+        }
+        .input-group {
+            margin: 10px 0;
+        }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -27,21 +43,37 @@
         <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
         <div id="search-results" class="search-results"></div>
         <input type="text" id="manualEntry" placeholder="Wpisz nazwę surowca ręcznie...">
-        <br><br>
-        <label for="totalWeight">Całkowita waga surowca (kg):</label>
-        <input type="number" id="totalWeight" required>
-        <br><br>
-        <label for="width">Szerokość surowca (mm):</label>
-        <input type="number" id="width" required>
-        <br><br>
-		<label for="location">Miejsce: </label>
-		<input type="text" id="location" required>
-		<br><br>
+        
+        <div class="mode-selector">
+            <label>Wybierz tryb obliczania:</label>
+            <label><input type="radio" name="calculationMode" value="weight" checked onchange="toggleMode()"> Z wagi</label>
+            <label><input type="radio" name="calculationMode" value="meters" onchange="toggleMode()"> Bezpośrednio metry</label>
+        </div>
+
+        <div class="input-group" id="weightGroup">
+            <label for="totalWeight">Całkowita waga surowca (kg):</label>
+            <input type="number" id="totalWeight" step="0.1">
+        </div>
+
+        <div class="input-group hidden" id="metersGroup">
+            <label for="meters">Metry (mb):</label>
+            <input type="number" id="meters" step="1">
+        </div>
+
+        <div class="input-group">
+            <label for="width">Szerokość surowca (mm):</label>
+            <input type="number" id="width" required>
+        </div>
+
+        <div class="input-group">
+            <label for="location">Miejsce: </label>
+            <input type="text" id="location" required>
+        </div>
 
         <button type="button" onclick="sendDataToSheet()">Wyślij</button>
         <button type="button" onclick="resetForm()">Resetuj</button>
     </form>
-    <h3>Metry:</h3>
+    <h3>Wynik:</h3>
     <div id="result"></div>
 
 <script>
@@ -49,14 +81,37 @@ document.addEventListener('DOMContentLoaded', function () {
     var searchInput = document.getElementById('search');
     var manualEntryInput = document.getElementById('manualEntry');
     var totalWeightInput = document.getElementById('totalWeight');
+    var metersInput = document.getElementById('meters');
     var widthInput = document.getElementById('width');
 
     searchInput.addEventListener('input', filterMaterials);
     totalWeightInput.addEventListener('input', checkForCalculations);
+    metersInput.addEventListener('input', checkForCalculations);
     widthInput.addEventListener('input', checkForCalculations);
 });
 
 let lastCalculation = {};
+
+function toggleMode() {
+    var mode = document.querySelector('input[name="calculationMode"]:checked').value;
+    var weightGroup = document.getElementById('weightGroup');
+    var metersGroup = document.getElementById('metersGroup');
+    
+    if (mode === 'weight') {
+        weightGroup.classList.remove('hidden');
+        metersGroup.classList.add('hidden');
+        document.getElementById('meters').value = '';
+    } else {
+        weightGroup.classList.add('hidden');
+        metersGroup.classList.remove('hidden');
+        document.getElementById('totalWeight').value = '';
+    }
+    
+    // Clear result when switching modes
+    document.getElementById('result').innerText = '';
+    lastCalculation = {};
+    checkForCalculations();
+}
 
 function filterMaterials() {
     var input = document.getElementById('search').value.toLowerCase();
@@ -68,7 +123,6 @@ function filterMaterials() {
     }
 
 var materials = [
-
 { "name": "8216781 Thermal Eco 300 RH9X HG65", "value": "0.144" },
 { "name": "8216828 Thermal Eco 300 RP51 HG65", "value": "0.144" },
 { "name": "8222362 Thermal Eco 200 RR23 HG65", "value": "0.144" },
@@ -200,10 +254,7 @@ var materials = [
 { "name": "HERMA Thermal TOP 62DPS", "value": "0.151" },
 { "name": "SYN-DURABLE 120", "value": "0.120" },
 { "name": "SYN-DURABLE 190", "value": "0.200" }	
-
-
-
-		];
+];
 
     resultsDiv.innerHTML = '';
     materials.filter(material => material.name.toLowerCase().includes(input))
@@ -223,10 +274,27 @@ var materials = [
 }
 
 function checkForCalculations() {
-    var totalWeight = parseFloat(document.getElementById('totalWeight').value);
+    var mode = document.querySelector('input[name="calculationMode"]:checked').value;
     var width = parseFloat(document.getElementById('width').value);
-    if (lastCalculation.density && totalWeight && width) {
-        calculate(lastCalculation.density, totalWeight, width);
+    
+    if (mode === 'weight') {
+        var totalWeight = parseFloat(document.getElementById('totalWeight').value);
+        if (lastCalculation.density && totalWeight && width) {
+            calculate(lastCalculation.density, totalWeight, width);
+        }
+    } else {
+        var meters = parseFloat(document.getElementById('meters').value);
+        if (meters && width) {
+            // In meters mode, just display the entered meters and calculate equivalent weight
+            lastCalculation.result = meters;
+            document.getElementById('result').innerText = "mb: " + meters;
+            
+            // Calculate equivalent weight for reference
+            if (lastCalculation.density && parseFloat(lastCalculation.density) > 0) {
+                var equivalentWeight = (meters * parseFloat(lastCalculation.density) * width / 1000) + 0.5;
+                document.getElementById('result').innerText += " (równoważna waga: " + equivalentWeight.toFixed(2) + " kg)";
+            }
+        }
     }
 }
 
@@ -237,14 +305,29 @@ function calculate(density, totalWeight, width) {
 }
 
 function sendDataToSheet() {
-    lastCalculation.weight = parseFloat(document.getElementById('totalWeight').value);
+    var mode = document.querySelector('input[name="calculationMode"]:checked').value;
+    
     lastCalculation.width = parseFloat(document.getElementById('width').value);
     lastCalculation.material = document.getElementById('search').value || document.getElementById('manualEntry').value;
-	lastCalculation.location = document.getElementById('location').value; 
-	lastCalculation.timestamp = new Date().toISOString();
-	
+    lastCalculation.location = document.getElementById('location').value; 
+    lastCalculation.timestamp = new Date().toISOString();
+    lastCalculation.calculationMode = mode;
     
-     if (lastCalculation.location && (lastCalculation.weight && lastCalculation.width)) {
+    if (mode === 'weight') {
+        lastCalculation.weight = parseFloat(document.getElementById('totalWeight').value);
+        lastCalculation.meters = lastCalculation.result;
+    } else {
+        lastCalculation.meters = parseFloat(document.getElementById('meters').value);
+        // Calculate equivalent weight if density is available
+        if (lastCalculation.density && parseFloat(lastCalculation.density) > 0) {
+            lastCalculation.weight = (lastCalculation.meters * parseFloat(lastCalculation.density) * lastCalculation.width / 1000) + 0.5;
+        }
+    }
+    
+    var requiredFieldsFilled = lastCalculation.location && lastCalculation.width && lastCalculation.material;
+    var modeSpecificFieldsFilled = (mode === 'weight' && lastCalculation.weight) || (mode === 'meters' && lastCalculation.meters);
+    
+    if (requiredFieldsFilled && modeSpecificFieldsFilled) {
         console.log(JSON.stringify(lastCalculation));
         fetch('https://script.google.com/macros/s/AKfycbyllIQYY8-0gfjoJw48BJpWwdN1GTmObXbJc8gMlG6MD0ciwF62kRyzFR60Ta0n8VOA/exec', {
             method: 'POST',
@@ -264,19 +347,21 @@ function sendDataToSheet() {
             alert("Wystąpił błąd podczas wysyłania danych: " + error);
         });
     } else {
-        alert("Proszę uzupełnić dane przed wysłaniem.");
+        alert("Proszę uzupełnić wszystkie wymagane dane przed wysłaniem.");
     }
 }
 
 function resetForm() {
     document.getElementById('calcForm').reset();
     document.getElementById('result').innerText = '';
+    document.getElementById('search-results').innerHTML = '';
     lastCalculation = {};
+    
+    // Reset to weight mode by default
+    document.querySelector('input[name="calculationMode"][value="weight"]').checked = true;
+    toggleMode();
 }
 </script>
-
-
-
 
 </body>
 </html>
