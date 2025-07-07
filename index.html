@@ -109,7 +109,15 @@ function toggleMode() {
     
     // Clear result when switching modes
     document.getElementById('result').innerText = '';
+    
+    // Reset calculation result but keep material and density info
+    var material = lastCalculation.material;
+    var density = lastCalculation.density;
     lastCalculation = {};
+    if (material) lastCalculation.material = material;
+    if (density) lastCalculation.density = density;
+    
+    // Trigger recalculation with current values
     checkForCalculations();
 }
 
