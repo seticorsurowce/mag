@@ -183,6 +183,18 @@
   </div>
 
   <script>
+
+
+    function setMode(selected) {
+  document.querySelectorAll('.form-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector('.form-button.' + selected).classList.add('active');
+}
+
+
+
+    
     let mode = 'przyjecie';
     function setMode(selected) {
       mode = selected;
