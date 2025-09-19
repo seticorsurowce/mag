@@ -181,12 +181,11 @@
       <div class="form-group">
         <label for="ilosc">Ilość:</label>
         <div class="ilosc-row">
-          <input type="text" id="ilosc" name="ilosc" required>
-          <select id="jednostka" name="jednostka" required>
-            <option value="1000szt">1000 szt.</option>
-            <option value="rolka">rolka</option>
-          </select>
-        </div>
+  <input type="text" id="ilosc" name="ilosc" required>
+  <label><input type="radio" name="jednostka" value="1000szt" required> 1000 szt.</label>
+  <label><input type="radio" name="jednostka" value="rolka"> rolka</label>
+</div>
+
       </div>
       <div class="form-actions">
         <button type="submit" class="submit-btn">Wyślij</button>
