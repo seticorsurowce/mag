@@ -183,7 +183,7 @@
 
   <script>
 
-
+    let mode = 'przyjecie';
     function setMode(selected) {
   document.querySelectorAll('.form-button').forEach(btn => {
     btn.classList.remove('active');
@@ -194,12 +194,8 @@
 
 
     
-    let mode = 'przyjecie';
-    function setMode(selected) {
-      mode = selected;
-      document.querySelectorAll('.form-button').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.form-button')[selected === 'przyjecie' ? 0 : 1].classList.add('active');
-    }
+    
+
 
     function updatePreview() {
       const val = document.getElementById('indeks').value.trim();
