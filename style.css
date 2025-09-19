@@ -119,7 +119,7 @@ button {
   flex-wrap: wrap;
   gap: 28px;          /* jeszcze większe odstępy między przyciskami */
   margin-top: 10px;
-  margin-bottom: 20px; /* dodatkowy odstęp od przycisków Wyślij/Resetuj */
+  margin-bottom: 40px; /* dodatkowy odstęp od przycisków Wyślij/Resetuj */
 }
 
 .location-options label {
@@ -129,6 +129,7 @@ button {
   cursor: pointer;
   font-size: 1.1rem;
 }
+
 
 
 
