@@ -183,13 +183,16 @@
 
   <script>
 
-    let mode = 'przyjecie';
-    function setMode(selected) {
+let mode = 'przyjecie';
+
+function setMode(selected) {
+  mode = selected; // <- ważne, żeby zmieniało arkusz docelowy
   document.querySelectorAll('.form-button').forEach(btn => {
     btn.classList.remove('active');
   });
   document.querySelector('.form-button.' + selected).classList.add('active');
 }
+
 
 
 
