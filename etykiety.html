@@ -142,7 +142,7 @@
 
     <form id="etykietyForm" onsubmit="handleSubmit(event)">
       <div class="form-group">
-        <label for="indeks">Indeks towaru: v3</label>
+        <label for="indeks">Indeks towaru: v4</label>
         <input type="text" id="indeks" name="indeks" required oninput="updatePreview()">
         <div id="indeks-preview"></div>
       </div>
@@ -219,7 +219,7 @@
 
   let sheetName = mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
 
-  fetch('https://script.google.com/macros/s/AKfycbwUBaT2vdMGSdTiRBOx9FwPjh5O7XHCXNrJlgYE-IEefxXyBCrTZ_ooCaeOd-BebFGd/exec', {
+  fetch('https://script.google.com/macros/s/AKfycbyO7tq1OsI48-P2jgT__hoLEepjzrlVLEzJ-_mhS6pWf68LZOZhPQK2c0WaXkyfTsmS/exec', {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
