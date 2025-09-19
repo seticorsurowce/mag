@@ -88,3 +88,29 @@ button {
   margin-top: 15px;
   font-weight: bold;
 }
+
+.form-button {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  background: #fff;
+  color: #333;
+}
+
+.form-button.active.przyjecie {
+  background-color: #28a745; /* zielony */
+  color: #fff;
+  border-color: #28a745;
+}
+
+.form-button.active.wydanie {
+  background-color: #dc3545; /* czerwony */
+  color: #fff;
+  border-color: #dc3545;
+}
+
