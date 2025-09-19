@@ -63,10 +63,22 @@
         <input type="number" id="width" required>
       </div>
 
-      <div class="form-group">
-        <label for="location">Miejsce:</label>
-        <input type="text" id="location" required>
-      </div>
+<div class="input-group">
+  <label>Miejsce:</label>
+  <div class="location-options">
+    <label><input type="radio" name="location" value="1" required> 1</label>
+    <label><input type="radio" name="location" value="2"> 2</label>
+    <label><input type="radio" name="location" value="3"> 3</label>
+    <label><input type="radio" name="location" value="4"> 4</label>
+    <label><input type="radio" name="location" value="5"> 5</label>
+    <label><input type="radio" name="location" value="6"> 6</label>
+    <label><input type="radio" name="location" value="7"> 7</label>
+    <label><input type="radio" name="location" value="8"> 8</label>
+    <label><input type="radio" name="location" value="9"> 9</label>
+    <label><input type="radio" name="location" value="0"> 0</label>
+  </div>
+</div>
+
 
       <div class="form-actions">
         <button type="button" class="submit-btn" onclick="sendDataToSheet()">Wyślij</button>
