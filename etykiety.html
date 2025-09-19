@@ -142,7 +142,7 @@
 
     <form id="etykietyForm" onsubmit="handleSubmit(event)">
       <div class="form-group">
-        <label for="indeks">Indeks towaru: v2</label>
+        <label for="indeks">Indeks towaru:</label>
         <input type="text" id="indeks" name="indeks" required oninput="updatePreview()">
         <div id="indeks-preview"></div>
       </div>
@@ -199,35 +199,42 @@
     }
 
     function handleSubmit(event) {
-      event.preventDefault();
-      
-      const formData = new FormData(event.target);
-      const data = {
-        typ: mode,
-        indeks: formData.get('indeks'),
-        kar: formData.get('kar'),
-        ilosc: formData.get('ilosc').replace(",", "."), // akceptuje przecinki
-        jednostka: formData.get('jednostka'),
-        timestamp: new Date().toISOString()
-      };
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  let indeksRaw = formData.get('indeks');
+  let indeks = indeksRaw;
+  if (indeksRaw.includes("|")) {
+    indeks = indeksRaw.split("|").pop().trim();
+  }
 
-      let sheetName = mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
+  const data = {
+    typ: mode,
+    indeks: indeks, // <- już tylko część po "|"
+    kar: formData.get('kar'),
+    ilosc: formData.get('ilosc'),
+    jednostka: formData.get('jednostka'),
+    timestamp: new Date().toISOString()
+  };
 
-      fetch('https://script.google.com/macros/s/AKfycbzl0z5AvE_bmJ8hLWm-4ULkUqx0P2q8WlDPsW8Je7NfNho6kIWL0hmKqKxVPZR4yf7Z/exec', {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sheet: sheetName, ...data })
-      })
-      .then(() => {
-          alert("Dane zostały wysłane!");
-          resetForm(); // czyści formularz i podgląd
-      })
-      .catch(error => {
-          console.error('Error:', error);
-          alert("Wystąpił błąd podczas wysyłania danych: " + error);
-      });
-    }
+  let sheetName = mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
+
+  fetch('https://script.google.com/macros/s/AKfycbzl0z5AvE_bmJ8hLWm-4ULkUqx0P2q8WlDPsW8Je7NfNho6kIWL0hmKqKxVPZR4yf7Z/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sheet: sheetName, ...data })
+  })
+  .then(() => {
+      alert("Dane zostały wysłane!");
+      event.target.reset(); 
+      document.getElementById('indeks-preview').innerText = ""; // też czyścimy podgląd
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      alert("Wystąpił błąd podczas wysyłania danych: " + error);
+  });
+}
 
     function resetForm() {
       const form = document.getElementById('etykietyForm');
