@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Surowce</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .mode-selector {
+      display: flex;
+      gap: 20px;
+      margin: 15px 0;
+    }
+    .mode-selector label {
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .search-results div {
+      padding: 5px;
+      margin-top: 2px;
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+    .search-results div:hover {
+      background-color: #e9e9e9;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <!-- MENU -->
+  <nav>
+    <a href="#" class="active">Surowce</a>
+    <a href="etykiety.html">Etykiety</a>
+  </nav>
+
+  <div class="container">
+    <form id="calcForm">
+      <div class="form-group">
+        <label for="search">Wyszukaj surowiec:</label>
+        <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
+        <div id="search-results" class="search-results"></div>
+      </div>
+
+      <div class="form-group">
+        <input type="text" id="manualEntry" placeholder="Wpisz nazwę surowca ręcznie...">
+      </div>
+
+      <div class="mode-selector">
+        <label><input type="radio" name="calculationMode" value="weight" checked onchange="toggleMode()"> Z wagi</label>
+        <label><input type="radio" name="calculationMode" value="meters" onchange="toggleMode()"> Metry (mb)</label>
+      </div>
+
+      <!-- Dynamiczne pole -->
+      <div class="form-group" id="inputGroup">
+        <label id="inputLabel" for="dynamicInput">Całkowita waga surowca (kg):</label>
+        <input type="number" id="dynamicInput" step="0.1">
+      </div>
+
+      <div class="form-group">
+        <label for="width">Szerokość surowca (mm):</label>
+        <input type="number" id="width" required>
+      </div>
+
+      <div class="form-group">
+        <label for="location">Miejsce:</label>
+        <input type="text" id="location" required>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="submit-btn" onclick="sendDataToSheet()">Wyślij</button>
+        <button type="button" class="reset-btn" onclick="resetForm()">Resetuj</button>
+      </div>
+    </form>
+
+    <h3>Wynik:</h3>
+    <div id="result"></div>
+  </div>
+
+<script>
+let lastCalculation = {};
+
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('dynamicInput').addEventListener('input', checkForCalculations);
+  document.getElementById('width').addEventListener('input', checkForCalculations);
+});
+
+function toggleMode() {
+  const mode = document.querySelector('input[name="calculationMode"]:checked').value;
+  const label = document.getElementById("inputLabel");
+  const input = document.getElementById("dynamicInput");
+  input.value = "";
+
+  if (mode === "weight") {
+    label.textContent = "Całkowita waga surowca (kg):";
+    input.setAttribute("step", "0.1");
+  } else {
+    label.textContent = "Metry (mb):";
+    input.setAttribute("step", "1");
+  }
+
+  document.getElementById("result").innerText = "";
+  let material = lastCalculation.material;
+  let density = lastCalculation.density;
+  lastCalculation = {};
+  if (material) lastCalculation.material = material;
+  if (density) lastCalculation.density = density;
+}
+
+function filterMaterials() {
+  const input = document.getElementById('search').value.toLowerCase();
+  const resultsDiv = document.getElementById('search-results');
+
+  if (input.length < 2) {
+    resultsDiv.innerHTML = '';
+    return;
+  }
+
+  const materials = [
+    { "name": "8216781 Thermal Eco 300 RH9X HG65", "value": "0.144" },
+    { "name": "8243572 Raflacoat Plus-FSC RH9X HG65", "value": "0.153" },
+    { "name": "8291498 Vellum TTR-FSC RP51 HG65", "value": "0.143" },
+    { "name": "ANTALIS Adestor A251 półbłysk", "value": "0.153" },
+    { "name": "IMA ECO HM", "value": "0.141" },
+    { "name": "ETP 170G", "value": "0.17" },
+    { "name": "Tickettherm PRO 220 SIHL", "value": "0.22" }
+    // [... reszta listy ...]
+  ];
+
+  resultsDiv.innerHTML = '';
+  materials.filter(material => material.name.toLowerCase().includes(input))
+    .forEach(material => {
+      const div = document.createElement('div');
+      div.textContent = material.name;
+      div.onclick = function() {
+        document.getElementById('search').value = material.name;
+        document.getElementById('manualEntry').value = '';
+        document.getElementById('search-results').innerHTML = '';
+        lastCalculation.material = material.name;
+        lastCalculation.density = material.value;
+        checkForCalculations();
+      };
+      resultsDiv.appendChild(div);
+    });
+}
+
+function checkForCalculations() {
+  const mode = document.querySelector('input[name="calculationMode"]:checked').value;
+  const width = parseFloat(document.getElementById('width').value);
+  const val = parseFloat(document.getElementById('dynamicInput').value);
+
+  if (mode === 'weight') {
+    if (lastCalculation.density && val && width) {
+      calculate(lastCalculation.density, val, width);
+    }
+  } else {
+    if (val && width) {
+      lastCalculation.result = val;
+      document.getElementById('result').innerText = "mb: " + val;
+
+      if (lastCalculation.density && parseFloat(lastCalculation.density) > 0) {
+        const equivalentWeight = (val * parseFloat(lastCalculation.density) * width / 1000) + 0.5;
+        document.getElementById('result').innerText += " (równoważna waga: " + equivalentWeight.toFixed(2) + " kg)";
+      }
+    }
+  }
+}
+
+function calculate(density, totalWeight, width) {
+  const result = (totalWeight - 0.5) / density / width * 1000;
+  lastCalculation.result = Math.ceil(result / 10) * 10;
+  document.getElementById('result').innerText = "mb: " + lastCalculation.result;
+}
+
+function sendDataToSheet() {
+  const mode = document.querySelector('input[name="calculationMode"]:checked').value;
+
+  lastCalculation.width = parseFloat(document.getElementById('width').value);
+  lastCalculation.material = document.getElementById('search').value || document.getElementById('manualEntry').value;
+  lastCalculation.location = document.getElementById('location').value; 
+  lastCalculation.timestamp = new Date().toISOString();
+  lastCalculation.calculationMode = mode;
+
+  if (mode === 'weight') {
+    lastCalculation.weight = parseFloat(document.getElementById('dynamicInput').value);
+    lastCalculation.meters = lastCalculation.result;
+  } else {
+    lastCalculation.meters = parseFloat(document.getElementById('dynamicInput').value);
+    if (lastCalculation.density && parseFloat(lastCalculation.density) > 0) {
+      lastCalculation.weight = (lastCalculation.meters * parseFloat(lastCalculation.density) * lastCalculation.width / 1000) + 0.5;
+    }
+  }
+
+  const requiredFieldsFilled = lastCalculation.location && lastCalculation.width && lastCalculation.material;
+  const modeSpecificFieldsFilled = (mode === 'weight' && lastCalculation.weight) || (mode === 'meters' && lastCalculation.meters);
+
+  if (requiredFieldsFilled && modeSpecificFieldsFilled) {
+    console.log(JSON.stringify(lastCalculation));
+    fetch('https://script.google.com/macros/s/AKfycbyllIQYY8-0gfjoJw48BJpWwdN1GTmObXbJc8gMlG6MD0ciwF62kRyzFR60Ta0n8VOA/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({...lastCalculation, sheet: "surowce"})
+
+    })
+    .then(() => {
+      alert("Dane zostały wysłane!");
+      resetForm();
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert("Wystąpił błąd podczas wysyłania danych: " + error);
+    });
+  } else {
+    alert("Proszę uzupełnić wszystkie wymagane dane przed wysłaniem.");
+  }
+}
+
+function resetForm() {
+  document.getElementById("calcForm").reset();
+  toggleMode();
+  document.getElementById("result").innerText = "";
+  lastCalculation = {};
+}
+</script>
+</body>
+</html>

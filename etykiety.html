@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etykiety</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+ nav {
+    background-color: #f8f8f8;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+nav a {
+    display: inline-block;
+    padding: 8px 16px;
+    margin-right: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #333;
+    background-color: #fff;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+nav a:hover {
+    background-color: #eee;
+    border-color: #999;
+}
+nav a.active {
+    background-color: #333;
+    color: white;
+    border-color: #333;
+}
+
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 20px;
+      max-width: 600px;
+    }
+    .form-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .form-button {
+      flex: 1;
+      padding: 10px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+      background: #fff;
+      color: #333;
+    }
+    .form-button.active {
+      background-color: #333;
+      color: #fff;
+      border-color: #333;
+    }
+
+    .form-group { margin-bottom: 15px; }
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #555;
+    }
+    .form-group input, .form-group select {
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    #indeks { width: 100%; }
+    #indeks-preview {
+      margin-top: 4px;
+      font-size: 0.9rem;
+      color: #666;
+      font-style: italic;
+    }
+
+    .ilosc-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    #ilosc {
+      width: 120px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .form-actions button {
+      flex: 1;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      text-transform: uppercase;
+    }
+    .submit-btn {
+      background: #333;
+      color: #fff;
+      border: none;
+    }
+    .submit-btn:hover { background: #555; }
+    .reset-btn {
+      background: #fff;
+      color: #333;
+      border: 1px solid #ccc;
+    }
+    .reset-btn:hover { background: #eee; }
+  </style>
+</head>
+<body>
+  <!-- MENU -->
+  <nav>
+    <a href="surowce.html">Surowce</a>
+    <a href="#" class="active">Etykiety</a>
+  </nav>
+
+  <div class="container">
+    <div class="form-selector">
+      <button type="button" class="form-button active" onclick="setMode('przyjecie')">Przyjęcie</button>
+      <button type="button" class="form-button" onclick="setMode('wydanie')">Wydanie</button>
+    </div>
+
+    <form id="etykietyForm" onsubmit="handleSubmit(event)">
+      <div class="form-group">
+        <label for="indeks">Indeks towaru:</label>
+        <input type="text" id="indeks" name="indeks" required oninput="updatePreview()">
+        <div id="indeks-preview"></div>
+      </div>
+      <div class="form-group">
+        <label for="kar">Miejsce (KAR):</label>
+        <select id="kar" name="kar" required>
+          <option value="">-- Wybierz --</option>
+          <option value="KAR01">KAR01</option>
+          <option value="KAR02">KAR02</option>
+          <option value="KAR03">KAR03</option>
+          <option value="KAR04">KAR04</option>
+          <option value="KAR05">KAR05</option>
+          <option value="KAR06">KAR06</option>
+          <option value="KAR07">KAR07</option>
+          <option value="KAR08">KAR08</option>
+          <option value="KAR09">KAR09</option>
+          <option value="KAR10">KAR10</option>
+          <option value="KAR11">KAR11</option>
+          <option value="KAR12">KAR12</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="ilosc">Ilość:</label>
+        <div class="ilosc-row">
+          <input type="text" id="ilosc" name="ilosc" required>
+          <select id="jednostka" name="jednostka" required>
+            <option value="1000szt">1000 szt.</option>
+            <option value="rolka">rolka</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="submit-btn">Wyślij</button>
+        <button type="button" class="reset-btn" onclick="resetForm()">Resetuj</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let mode = 'przyjecie';
+    function setMode(selected) {
+      mode = selected;
+      document.querySelectorAll('.form-button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.form-button')[selected === 'przyjecie' ? 0 : 1].classList.add('active');
+    }
+
+    function updatePreview() {
+      const val = document.getElementById('indeks').value.trim();
+      let out = val;
+      if (val.includes("|")) {
+        out = val.split("|").pop().trim();
+      }
+      document.getElementById('indeks-preview').innerText = out ? `Indeks: ${out}` : "";
+    }
+
+  function handleSubmit(event, formType) {
+  event.preventDefault();
+  
+  const formData = new FormData(event.target);
+  const data = {
+    typ: formType, // przyjecie lub wydanie
+    indeks: formData.get('indeks'),
+    kar: formData.get('kar'),
+    ilosc: formData.get('ilosc'),
+    jednostka: formData.get('jednostka'),
+    timestamp: new Date().toISOString()
+  };
+
+  console.log('Dane formularza:', data);
+
+  // wybór arkusza docelowego
+  let sheetName = formType === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
+
+  fetch('https://script.google.com/macros/s/AKfycbyllIQYY8-0gfjoJw48BJpWwdN1GTmObXbJc8gMlG6MD0ciwF62kRyzFR60Ta0n8VOA/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sheet: sheetName, ...data })
+  })
+  .then(() => {
+      alert("Dane zostały wysłane!");
+      event.target.reset();
+      document.getElementById(formType + "-form").classList.remove("active");
+      activeForm = null;
+  })
+  .catch(error => {
+      console.error('Error:', error);
+      alert("Wystąpił błąd podczas wysyłania danych: " + error);
+  });
+}
+
+  </script>
+</body>
+</html>
