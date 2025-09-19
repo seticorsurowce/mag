@@ -198,12 +198,12 @@ nav a.active {
       document.getElementById('indeks-preview').innerText = out ? `Indeks: ${out}` : "";
     }
 
-  function handleSubmit(event, formType) {
+function handleSubmit(event, formType) {
   event.preventDefault();
   
   const formData = new FormData(event.target);
   const data = {
-    typ: formType, // przyjecie lub wydanie
+    typ: formType,
     indeks: formData.get('indeks'),
     kar: formData.get('kar'),
     ilosc: formData.get('ilosc'),
@@ -211,9 +211,6 @@ nav a.active {
     timestamp: new Date().toISOString()
   };
 
-  console.log('Dane formularza:', data);
-
-  // wybór arkusza docelowego
   let sheetName = formType === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
 
   fetch('https://script.google.com/macros/s/AKfycbyllIQYY8-0gfjoJw48BJpWwdN1GTmObXbJc8gMlG6MD0ciwF62kRyzFR60Ta0n8VOA/exec', {
@@ -224,15 +221,14 @@ nav a.active {
   })
   .then(() => {
       alert("Dane zostały wysłane!");
-      event.target.reset();
-      document.getElementById(formType + "-form").classList.remove("active");
-      activeForm = null;
+      event.target.reset(); // ✅ wyczyszczenie pól
   })
   .catch(error => {
       console.error('Error:', error);
       alert("Wystąpił błąd podczas wysyłania danych: " + error);
   });
 }
+
 
   </script>
 </body>
