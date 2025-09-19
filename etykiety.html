@@ -13,31 +13,31 @@
       padding: 20px;
     }
 
- nav {
-    background-color: #f8f8f8;
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-}
-nav a {
-    display: inline-block;
-    padding: 8px 16px;
-    margin-right: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    text-decoration: none;
-    color: #333;
-    background-color: #fff;
-    transition: background-color 0.2s, border-color 0.2s;
-}
-nav a:hover {
-    background-color: #eee;
-    border-color: #999;
-}
-nav a.active {
-    background-color: #333;
-    color: white;
-    border-color: #333;
-}
+    nav {
+      background-color: #f8f8f8;
+      padding: 10px 20px;
+      border-bottom: 1px solid #ddd;
+    }
+    nav a {
+      display: inline-block;
+      padding: 8px 16px;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      background-color: #fff;
+      transition: background-color 0.2s, border-color 0.2s;
+    }
+    nav a:hover {
+      background-color: #eee;
+      border-color: #999;
+    }
+    nav a.active {
+      background-color: #333;
+      color: white;
+      border-color: #333;
+    }
 
     .container {
       background: white;
@@ -142,7 +142,7 @@ nav a.active {
 
     <form id="etykietyForm" onsubmit="handleSubmit(event)">
       <div class="form-group">
-        <label for="indeks">Indeks towaru:</label>
+        <label for="indeks">Indeks towaru: v2</label>
         <input type="text" id="indeks" name="indeks" required oninput="updatePreview()">
         <div id="indeks-preview"></div>
       </div>
@@ -198,39 +198,42 @@ nav a.active {
       document.getElementById('indeks-preview').innerText = out ? `Indeks: ${out}` : "";
     }
 
-function handleSubmit(event) {
-  event.preventDefault();
-  
-  const formData = new FormData(event.target);
-  const data = {
-    typ: mode,
-    indeks: formData.get('indeks'),
-    kar: formData.get('kar'),
-    ilosc: formData.get('ilosc'),
-    jednostka: formData.get('jednostka'),
-    timestamp: new Date().toISOString()
-  };
+    function handleSubmit(event) {
+      event.preventDefault();
+      
+      const formData = new FormData(event.target);
+      const data = {
+        typ: mode,
+        indeks: formData.get('indeks'),
+        kar: formData.get('kar'),
+        ilosc: formData.get('ilosc').replace(",", "."), // akceptuje przecinki
+        jednostka: formData.get('jednostka'),
+        timestamp: new Date().toISOString()
+      };
 
-  let sheetName = mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
+      let sheetName = mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
 
-  fetch('https://script.google.com/macros/s/AKfycbzl0z5AvE_bmJ8hLWm-4ULkUqx0P2q8WlDPsW8Je7NfNho6kIWL0hmKqKxVPZR4yf7Z/exec', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sheet: sheetName, ...data })
-  })
-  .then(() => {
-      alert("Dane zostały wysłane!");
-      event.target.reset(); 
-  })
-  .catch(error => {
-      console.error('Error:', error);
-      alert("Wystąpił błąd podczas wysyłania danych: " + error);
-  });
-}
+      fetch('https://script.google.com/macros/s/AKfycbzl0z5AvE_bmJ8hLWm-4ULkUqx0P2q8WlDPsW8Je7NfNho6kIWL0hmKqKxVPZR4yf7Z/exec', {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sheet: sheetName, ...data })
+      })
+      .then(() => {
+          alert("Dane zostały wysłane!");
+          resetForm(); // czyści formularz i podgląd
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          alert("Wystąpił błąd podczas wysyłania danych: " + error);
+      });
+    }
 
-
-
+    function resetForm() {
+      const form = document.getElementById('etykietyForm');
+      form.reset();
+      document.getElementById('indeks-preview').innerText = ""; // czyści podgląd
+    }
   </script>
 </body>
 </html>
