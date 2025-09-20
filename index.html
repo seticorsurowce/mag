@@ -17,7 +17,7 @@
   </nav>
 
   <div class="container">
-    <form id="calcForm">
+    <form id="calcForm" onsubmit="event.preventDefault(); sendDataToSheet();">
       <div class="form-group">
         <label for="search">Wyszukaj surowiec:</label>
         <input type="text" id="search" oninput="filterMaterials()" placeholder="Wpisz nazwę surowca...">
@@ -61,10 +61,10 @@
 </div>
 
 
-      <div class="form-actions">
-        <button type="button" class="submit-btn" onclick="sendDataToSheet()">Wyślij</button>
-        <button type="button" class="reset-btn" onclick="resetForm()">Resetuj</button>
-      </div>
+  <div class="form-actions">
+    <button type="submit" class="submit-btn">Wyślij</button>
+    <button type="button" class="reset-btn" onclick="resetForm()">Resetuj</button>
+  </div>
     </form>
 
     <h3>Wynik:</h3>
