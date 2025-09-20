@@ -227,6 +227,8 @@ function calculate(density, totalWeight, width) {
 }
 
 function sendDataToSheet() {
+  disableSubmit('calcForm');
+
   const mode = document.querySelector('input[name="calculationMode"]:checked')?.value;
 
   // 🔧 MIEJSCE (radio)
@@ -260,8 +262,10 @@ function sendDataToSheet() {
       () => {
         alert("Dane zostały wysłane!");
         resetSurowceForm();
+        enableSubmit('calcForm');
       },
       (error) => alert("Błąd: " + error)
+      enableSubmit('calcForm');
     );
   } else {
     alert("Proszę uzupełnić wszystkie wymagane dane przed wysłaniem.");
@@ -282,4 +286,5 @@ window.toggleMode = toggleMode;
 window.filterMaterials = filterMaterials;
 window.sendDataToSheet = sendDataToSheet;
 window.resetSurowceForm = resetSurowceForm;
+
 
