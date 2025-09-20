@@ -1,26 +1,5 @@
-// etykiety.js
-let mode = 'przyjecie';
-
-function setMode(selected) {
-  mode = selected;
-  document.querySelectorAll('.form-button').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  document.querySelector('.form-button.' + selected).classList.add('active');
-}
-
-function updatePreview() {
-  const val = document.getElementById('indeks').value.trim();
-  let out = val;
-  if (val.includes("|")) {
-    out = val.split("|").pop().trim();
-  }
-  document.getElementById('indeks-preview').innerText = out ? `Indeks: ${out}` : "";
-}
-
 function handleSubmit(event) {
   disableSubmit('etykietyForm');
-
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -51,8 +30,9 @@ function handleSubmit(event) {
         document.getElementById('indeks-preview').innerText = "";
       });
     },
-    (error) => alert("Błąd: " + error);
-    enableSubmit('etykietyForm');
+    (error) => {
+      alert("Błąd: " + error);
+      enableSubmit('etykietyForm');
+    }
   );
 }
-
