@@ -195,13 +195,23 @@ button {
   text-transform: uppercase;
 }
 
+.ilosc-row {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* większy odstęp między polem a opcjami */
+  flex-wrap: wrap; /* jeśli będzie mało miejsca na mobile, to ładnie się złamie */
+}
+
 .ilosc-row label {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px; /* odstęp między kółkiem a tekstem */
   font-weight: normal;
   cursor: pointer;
+  white-space: nowrap; /* nie łamie „1000 szt.” */
 }
+
+
 
 
 
