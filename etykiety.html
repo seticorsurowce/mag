@@ -62,78 +62,9 @@
       </div>
     </form>
   </div>
-
-  <script>
-
-let mode = 'przyjecie';
-
-function setMode(selected) {
-  mode = selected; // <- ważne, żeby zmieniało arkusz docelowy
-  document.querySelectorAll('.form-button').forEach(btn => {
-    btn.classList.remove('active');
-  });
-  document.querySelector('.form-button.' + selected).classList.add('active');
-}
+<script src="js/common.js"></script>
+<script src="js/etykiety.js"></script>
 
 
-
-
-    
-    
-
-
-    function updatePreview() {
-      const val = document.getElementById('indeks').value.trim();
-      let out = val;
-      if (val.includes("|")) {
-        out = val.split("|").pop().trim();
-      }
-      document.getElementById('indeks-preview').innerText = out ? `Indeks: ${out}` : "";
-    }
-
-    function handleSubmit(event) {
-  event.preventDefault();
-  
-  const formData = new FormData(event.target);
-  let indeksRaw = formData.get('indeks');
-  let indeks = indeksRaw;
-  if (indeksRaw.includes("|")) {
-    indeks = indeksRaw.split("|").pop().trim();
-  }
-
-  const data = {
-    typ: mode,
-    indeks: indeks, // <- już tylko część po "|"
-    kar: formData.get('kar'),
-    ilosc: formData.get('ilosc'),
-    jednostka: formData.get('jednostka'),
-    timestamp: new Date().toISOString()
-  };
-
-  let sheetName = mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
-
-  fetch('https://script.google.com/macros/s/AKfycbyO7tq1OsI48-P2jgT__hoLEepjzrlVLEzJ-_mhS6pWf68LZOZhPQK2c0WaXkyfTsmS/exec', {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sheet: sheetName, ...data })
-  })
-  .then(() => {
-      alert("Dane zostały wysłane!");
-      event.target.reset(); 
-      document.getElementById('indeks-preview').innerText = ""; // też czyścimy podgląd
-  })
-  .catch(error => {
-      console.error('Error:', error);
-      alert("Wystąpił błąd podczas wysyłania danych: " + error);
-  });
-}
-
-    function resetForm() {
-      const form = document.getElementById('etykietyForm');
-      form.reset();
-      document.getElementById('indeks-preview').innerText = ""; // czyści podgląd
-    }
-  </script>
 </body>
 </html>
