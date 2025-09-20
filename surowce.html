@@ -28,6 +28,63 @@
     .hidden { display: none; }
   </style>
 </head>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js"></script>
+
+<script>
+  // Konfiguracja z Firebase Console
+  const firebaseConfig = {
+    apiKey: "AIzaSyAm82U3IigqwwJfcJG36w9kP3Sy1Vt2dew",
+    authDomain: "magazyn-90984.firebaseapp.com",
+    projectId: "magazyn-90984",
+    storageBucket: "magazyn-90984.firebasestorage.app",
+    messagingSenderId: "1037083444644",
+    appId: "1:1037083444644:web:b4a13a799cdc4486fe6d31"
+  };
+
+  // Inicjalizacja
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const pass  = document.getElementById("password").value;
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(userCred => {
+        console.log("Zalogowano:", userCred.user.email);
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("app").style.display = "block";
+      })
+      .catch(err => {
+        alert("Błąd logowania: " + err.message);
+      });
+  }
+
+  function logout() {
+    auth.signOut().then(() => {
+      document.getElementById("app").style.display = "none";
+      document.getElementById("login-box").style.display = "block";
+    });
+  }
+</script>
+
+
+  <div id="login-box">
+    <h2>Logowanie</h2>
+    <input type="text" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Hasło">
+    <button onclick="login()">Zaloguj</button>
+  </div>
+
+  <div id="app" style="display:none;">
+    <button onclick="logout()">Wyloguj</button>
+  </div>
+
+
+
+  
 <body>
   <!-- MENU -->
   <nav>
