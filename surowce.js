@@ -256,17 +256,20 @@ function sendDataToSheet() {
   const modeOk   = (mode === 'weight' && lastCalculation.weight) || (mode === 'meters' && lastCalculation.meters);
 
   if (required && modeOk) {
-    sendToGoogleSheet(
-      'https://script.google.com/macros/s/AKfycbzl0z5AvE_bmJ8hLWm-4ULkUqx0P2q8WlDPsW8Je7NfNho6kIWL0hmKqKxVPZR4yf7Z/exec',
-      { ...lastCalculation, sheet: "surowce" },
-      () => {
-        alert("Dane zostały wysłane!");
-        resetSurowceForm();
-        enableSubmit('calcForm');
-      },
-      (error) => alert("Błąd: " + error)
-      enableSubmit('calcForm');
-    );
+sendToGoogleSheet(
+  'https://script.google.com/macros/s/AKfycbzl0z5AvE_bmJ8hLWm-4ULkUqx0P2q8WlDPsW8Je7NfNho6kIWL0hmKqKxVPZR4yf7Z/exec',
+  { ...lastCalculation, sheet: "surowce" },
+  () => {
+    alert("Dane zostały wysłane!");
+    resetSurowceForm();
+    enableSubmit('calcForm');
+  },
+  (error) => {
+    alert("Błąd: " + error);
+    enableSubmit('calcForm');
+  }
+);
+
   } else {
     alert("Proszę uzupełnić wszystkie wymagane dane przed wysłaniem.");
   }
@@ -286,5 +289,6 @@ window.toggleMode = toggleMode;
 window.filterMaterials = filterMaterials;
 window.sendDataToSheet = sendDataToSheet;
 window.resetSurowceForm = resetSurowceForm;
+
 
 
