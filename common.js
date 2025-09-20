@@ -20,3 +20,25 @@ function resetForm(formId, extraClearFn = null) {
   if (form) form.reset();
   if (extraClearFn) extraClearFn();
 }
+
+
+function disableSubmit(formId) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Wysyłanie..."; // opcjonalnie zmiana tekstu
+  }
+}
+
+function enableSubmit(formId) {
+  const form = document.getElementById(formId);
+  if (!form) return;
+  const btn = form.querySelector('button[type="submit"]');
+  if (btn) {
+    btn.disabled = false;
+    btn.textContent = "Wyślij";
+  }
+}
+
