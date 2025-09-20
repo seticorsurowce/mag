@@ -19,6 +19,8 @@ function updatePreview() {
 }
 
 function handleSubmit(event) {
+  disableSubmit('etykietyForm');
+
   event.preventDefault();
 
   const formData = new FormData(event.target);
@@ -44,10 +46,13 @@ function handleSubmit(event) {
     { sheet: sheetName, ...data },
     () => {
       alert("Dane zostały wysłane!");
+      enableSubmit('etykietyForm');
       resetForm("etykietyForm", () => {
         document.getElementById('indeks-preview').innerText = "";
       });
     },
-    (error) => alert("Błąd: " + error)
+    (error) => alert("Błąd: " + error);
+    enableSubmit('etykietyForm');
   );
 }
+
