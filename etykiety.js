@@ -1,6 +1,6 @@
 function handleSubmit(event) {
-  disableSubmit('etykietyForm');
   event.preventDefault();
+  disableSubmit('etykietyForm');
 
   const formData = new FormData(event.target);
   let indeksRaw = formData.get('indeks');
@@ -20,14 +20,14 @@ function handleSubmit(event) {
   sendToGoogleSheet(
     'https://script.google.com/macros/s/AKfycbyO7tq1OsI48-P2jgT__hoLEepjzrlVLEzJ-_mhS6pWf68LZOZhPQK2c0WaXkyfTsmS/exec',
     { sheet: sheetName, ...data },
-    () => {   // sukces
+    () => {
       alert("Dane zostały wysłane!");
       resetForm("etykietyForm", () => {
         document.getElementById('indeks-preview').innerText = "";
       });
       enableSubmit('etykietyForm');
     },
-    (error) => {  // błąd
+    (error) => {
       alert("Błąd: " + error);
       enableSubmit('etykietyForm');
     }
