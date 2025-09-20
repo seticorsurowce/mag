@@ -1,3 +1,23 @@
+// zamiast let mode = 'przyjecie';
+window.mode = 'przyjecie';
+
+function setMode(selected) {
+  window.mode = selected; // zapis do globalnej zmiennej
+  document.querySelectorAll('.form-button').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  document.querySelector('.form-button.' + selected).classList.add('active');
+}
+
+function updatePreview() {
+  const val = document.getElementById('indeks').value.trim();
+  let out = val;
+  if (val.includes("|")) {
+    out = val.split("|").pop().trim();
+  }
+  document.getElementById('indeks-preview').innerText = out ? `Indeks: ${out}` : "";
+}
+
 function handleSubmit(event) {
   event.preventDefault();
   disableSubmit('etykietyForm');
@@ -7,7 +27,7 @@ function handleSubmit(event) {
   let indeks = indeksRaw.includes("|") ? indeksRaw.split("|").pop().trim() : indeksRaw;
 
   const data = {
-    typ: mode,
+    typ: window.mode, // ⬅️ używamy globalnego mode
     indeks: indeks,
     kar: formData.get('kar'),
     ilosc: formData.get('ilosc'),
@@ -15,7 +35,7 @@ function handleSubmit(event) {
     timestamp: new Date().toISOString()
   };
 
-  let sheetName = mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
+  let sheetName = window.mode === 'przyjecie' ? 'przyjecia_imp' : 'wydania_imp';
 
   sendToGoogleSheet(
     'https://script.google.com/macros/s/AKfycbyO7tq1OsI48-P2jgT__hoLEepjzrlVLEzJ-_mhS6pWf68LZOZhPQK2c0WaXkyfTsmS/exec',
@@ -33,3 +53,8 @@ function handleSubmit(event) {
     }
   );
 }
+
+// Wystawiamy funkcje dla inline w HTML
+window.setMode = setMode;
+window.updatePreview = updatePreview;
+window.handleSubmit = handleSubmit;
