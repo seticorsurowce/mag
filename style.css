@@ -158,6 +158,50 @@ button {
 }
 
 
+.form-selector {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+#indeks {
+  width: 100%;
+}
+
+#indeks-preview {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
+}
+
+#ilosc {
+  width: 120px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.form-actions button {
+  flex: 1;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.ilosc-row label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: normal;
+  cursor: pointer;
+}
 
 
 
