@@ -130,8 +130,6 @@ function filterMaterials() {
 { "name": "Polcoat INKJET MAT", "value": "0.2" },
 { "name": "Polcoat KRAFT", "value": "0.2" },
 { "name": "Polcoat PP INKJET MAT", "value": "0.2" },
-{ "name": "PP White akryl ANTALIS", "value": "0.124" },
-{ "name": "PP White akryl ANTALIS / PET", "value": "0.124" },
 { "name": "Herma PP White 62xpc", "value": "0.124" },
 { "name": "PP White PRO TYRE POLCOAT", "value": "0.15" },
 { "name": "PP White T7 Intercoat", "value": "0.0" },
@@ -172,6 +170,7 @@ function filterMaterials() {
 { "name": "HERMA Thermal TOP 62GPT", "value": "0.151" },
 { "name": "HERMA Thermal TOP 62DPS", "value": "0.151" },
 { "name": "SYN-DURABLE 120", "value": "0.120" },
+{ "name": "FILM OPP GL WHITE (ANTALIS PP WHITE PERMANENT)", "value": "0.124" },    
 { "name": "SYN-DURABLE 190", "value": "0.200" }	
 ];
 
@@ -289,6 +288,7 @@ window.toggleMode = toggleMode;
 window.filterMaterials = filterMaterials;
 window.sendDataToSheet = sendDataToSheet;
 window.resetSurowceForm = resetSurowceForm;
+
 
 
 
